@@ -45,7 +45,7 @@ impl<'a> Game<'a> {
     }
 
     pub fn create_game_file(&self) {
-        let path = format!("{}{}", &self.save_dir, &self.data.player.name);
+        let path = format!("{}{}.save", &self.save_dir, &self.data.player.name);
         let _file = std::fs::File::options()
             .write(true)
             .truncate(true)
@@ -55,7 +55,7 @@ impl<'a> Game<'a> {
     }
 
     pub fn save_game(&self) {
-        let path = format!("{}{}", &self.save_dir, &self.data.player.name);
+        let path = format!("{}{}.save", &self.save_dir, &self.data.player.name);
         let mut file = std::fs::File::options()
             .create(true)
             .write(true)
@@ -68,7 +68,7 @@ impl<'a> Game<'a> {
     }
 
     pub fn load_game(&mut self, name: &str) {
-        let path = format!("{}{}", &self.save_dir, name);
+        let path = format!("{}{}.save", &self.save_dir, name);
         let file = std::fs::File::options()
             .read(true)
             .open(&path)
