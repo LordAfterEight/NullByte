@@ -42,7 +42,7 @@ pub async fn render_save_menu(game: &mut crate::structs::Game<'_>) {
             let save = save.unwrap();
             let save_path = save.path();
 
-            if save_path.is_file() {
+            if save_path.is_file() && save_path.to_str().unwrap().contains(".save") {
                 saves.push(crate::ui::Button::new(
                     &format!(
                         "{}",
