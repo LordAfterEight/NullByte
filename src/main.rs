@@ -2,7 +2,6 @@ use macroquad::miniquad::conf::Icon;
 use macroquad::prelude::*;
 use rotilities;
 
-mod screens;
 mod main_menu;
 mod save_menu;
 mod settings_menu;
@@ -40,9 +39,13 @@ async fn main() {
     rotilities::set_audio_volume(&game.audio.music_sinks[0], game.settings.mus_vol);
     rotilities::set_audio_volume(&game.audio.sfx_sinks[0], game.settings.sfx_vol);
 
+    let domain_name = game.data.player.domain.name();
+    game.drp.connect(&game.audio.sfx_sinks[0]);
+
     loop {
         match game.current_screen {
             crate::structs::Screens::MainMenu => {
+                game.drp.update(Some(&domain_name), "Main Menu");
                 if game.previous_screen == Some(crate::structs::Screens::InGame) {
                     let mut new_volume = game.settings.mus_vol;
                     while game.audio.music_sinks[0].volume() > 0.001 {
@@ -69,7 +72,11 @@ async fn main() {
             crate::structs::Screens::SettingsMenu => {
                 crate::settings_menu::render_settings_screen(&mut game).await;
                 if game.audio.music_sinks[0].empty() {
-                    rotilities::play_audio(&game.audio.music_sinks[0], "./assets/sound/music/NullByte (Main Menu theme).mp3");
+                    match game.previous_screen {
+                        Some(crate::structs::Screens::InGame) => rotilities::play_audio(&game.audio.music_sinks[0], "./assets/sound/music/Signal Lost.mp3"),
+                        Some(crate::structs::Screens::MainMenu) => rotilities::play_audio(&game.audio.music_sinks[0], "./assets/sound/music/NullByte (Main Menu theme).mp3"),
+                        _ => {}
+                    }
                 }
             },
             crate::structs::Screens::InGame => {

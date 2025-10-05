@@ -1,7 +1,8 @@
 use macroquad::prelude::*;
 
-pub async fn render_game_screen(game: &mut crate::structs::Game) {
-    if game.previous_screen.take().unwrap() == crate::structs::Screens::MainMenu {
+pub async fn render_game_screen(game: &mut crate::structs::Game<'_>) {
+    game.drp.update(None, "Ingame");
+    if game.previous_screen == Some(crate::structs::Screens::MainMenu) {
         let mut alpha = 0.0;
         let mut frames = 0;
 
@@ -18,11 +19,11 @@ pub async fn render_game_screen(game: &mut crate::structs::Game) {
 
         while alpha < 255.0 {
             draw_text_ex(
-                "Prime System",
+                &game.data.player.domain.name(),
                 screen_width() / 2.0
-                    - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).width / 2.0,
+                    - measure_text(&game.data.player.domain.name(), Some(&game.fonts[1]), 50, 1.0).width / 2.0,
                 screen_height() / 2.0
-                    - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).height / 2.0,
+                    - measure_text(&game.data.player.domain.name(), Some(&game.fonts[1]), 50, 1.0).height / 2.0,
                 TextParams {
                     font_size: 50,
                     color: Color::from_rgba(255, 255, 255, alpha as u8),
@@ -36,11 +37,11 @@ pub async fn render_game_screen(game: &mut crate::structs::Game) {
 
         while frames < 215 {
             draw_text_ex(
-                "Prime System",
+                &game.data.player.domain.name(),
                 screen_width() / 2.0
-                    - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).width / 2.0,
+                    - measure_text(&game.data.player.domain.name(), Some(&game.fonts[1]), 50, 1.0).width / 2.0,
                 screen_height() / 2.0
-                    - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).height / 2.0,
+                    - measure_text(&game.data.player.domain.name(), Some(&game.fonts[1]), 50, 1.0).height / 2.0,
                 TextParams {
                     font_size: 50,
                     color: Color::from_rgba(255, 255, 255, 255),
@@ -54,11 +55,11 @@ pub async fn render_game_screen(game: &mut crate::structs::Game) {
 
         while alpha >= 0.01 {
             draw_text_ex(
-                "Prime System",
+                &game.data.player.domain.name(),
                 screen_width() / 2.0
-                    - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).width / 2.0,
+                    - measure_text(&game.data.player.domain.name(), Some(&game.fonts[1]), 50, 1.0).width / 2.0,
                 screen_height() / 2.0
-                    - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).height / 2.0,
+                    - measure_text(&game.data.player.domain.name(), Some(&game.fonts[1]), 50, 1.0).height / 2.0,
                 TextParams {
                     font_size: 50,
                     color: Color::from_rgba(255, 255, 255, alpha as u8),

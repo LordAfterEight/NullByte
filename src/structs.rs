@@ -1,7 +1,8 @@
 use std::io::Write;
 
+use discord_rich_presence::DiscordIpc;
 use macroquad::prelude::*;
-pub struct Game {
+pub struct Game<'a> {
     /// Directory where the save is stored
     pub save_dir: String,
     /// Game data
@@ -14,9 +15,11 @@ pub struct Game {
     pub fonts: Vec<Font>,
     pub audio: Audio,
     pub cursor: Cursor,
+    /// Discord Rich Presence
+    pub drp: DrpClient<'a>,
 }
 
-impl Game {
+impl<'a> Game<'a> {
     pub async fn init() -> Self {
         Self {
             save_dir: "./data/saves/".to_string(),
@@ -37,12 +40,13 @@ impl Game {
             ],
             audio: Audio::init(),
             cursor: Cursor::new().await,
+            drp: DrpClient::new(),
         }
     }
 
     pub fn create_game_file(&self) {
         let path = format!("{}{}", &self.save_dir, &self.data.player.name);
-        let mut file = std::fs::File::options()
+        let _file = std::fs::File::options()
             .write(true)
             .truncate(true)
             .create(true)
@@ -55,11 +59,11 @@ impl Game {
         let mut file = std::fs::File::options()
             .create(true)
             .write(true)
+            .truncate(true)
             .open(&path)
             .expect(&format!("File at \"{}\" could not be opened", path));
-
-        let data = serde_json::to_string_pretty(&serde_json::json!([&self.data, &self.settings])).unwrap();
-
+        let data =
+            serde_json::to_string_pretty(&serde_json::json!([&self.data, &self.settings])).unwrap();
         _ = file.write(data.as_bytes());
     }
 
@@ -254,6 +258,7 @@ pub struct Player {
     pub name: String,
     pub age: u16,
     pub location: String,
+    pub domain: Domain,
 }
 
 impl Player {
@@ -262,6 +267,90 @@ impl Player {
             name: "Player".to_string(),
             age: 18,
             location: "".to_string(),
+            domain: Domain::init(),
         }
     }
+}
+
+pub struct DrpClient<'a> {
+    client: discord_rich_presence::DiscordIpcClient,
+    activity: discord_rich_presence::activity::Activity<'a>,
+    previous_state: &'a str
+}
+
+impl<'a> DrpClient<'a> {
+    pub fn new() -> Self {
+        Self {
+            client: discord_rich_presence::DiscordIpcClient::new("1424335981036834887").unwrap(),
+            activity: discord_rich_presence::activity::Activity::new(),
+            previous_state: ""
+        }
+    }
+
+    pub fn update(&mut self, state: Option<&'a str>, details: &'a str) {
+        if state.is_some() {
+            self.previous_state = state.unwrap();
+        }
+        self.activity = match state {
+            Some(c) => discord_rich_presence::activity::Activity::new()
+                    .details(details)
+                    .state(state.unwrap()),
+            None => discord_rich_presence::activity::Activity::new()
+                .details(details)
+                .state(self.previous_state)
+        };
+        _ = self.client.set_activity(self.activity.clone());
+    }
+
+    pub fn connect(&mut self, sink: &rotilities::Sink) {
+        match self.client.connect() {
+            Ok(_) => {}
+            Err(_) => rotilities::play_audio(sink, "./assets/sound/sfx/fail.mp3"),
+        };
+    }
+}
+
+#[derive(Debug, serde_derive::Serialize, serde_derive::Deserialize)]
+pub struct Domain {
+    current: Domains,
+    pub name: String,
+}
+
+impl Domain {
+    pub fn init() -> Self {
+        Self {
+            current: Domains::Prime,
+            name: "Domain [Prime]".to_string()
+        }
+    }
+
+    pub fn set_current(&mut self, domain: Domains) {
+        self.name = match domain {
+            Domains::Prime => "Domain [Prime]".to_string(),
+            Domains::Expanse => "Domain [Expanse]".to_string(),
+            Domains::Void => "Domain [Void]".to_string(),
+            Domains::Redacted => "[Redacted]".to_string(),
+            Domains::D56XFG => "Domain [D56XFG]".to_string(),
+        };
+        self.current = domain;
+    }
+
+    pub fn name(&self) -> String {
+        match &self.current {
+            Domains::Prime => "Domain [Prime]".to_string(),
+            Domains::Expanse => "Domain [Expanse]".to_string(),
+            Domains::Void => "Domain [Void]".to_string(),
+            Domains::Redacted => "[Redacted]".to_string(),
+            Domains::D56XFG => "Domain [D56XFG]".to_string(),
+        }
+    }
+}
+
+#[derive(Debug, serde_derive::Serialize, serde_derive::Deserialize)]
+pub enum Domains {
+    Prime,
+    Expanse,
+    Void,
+    Redacted,
+    D56XFG,
 }

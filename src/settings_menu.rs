@@ -1,19 +1,10 @@
 use macroquad::prelude::*;
 
-pub async fn render_settings_screen(game: &mut crate::structs::Game) {
+pub async fn render_settings_screen(game: &mut crate::structs::Game<'_>) {
     let back_button =
         crate::ui::Button::new("Back", 5.0, 2.5, 100.0, 30.0, crate::ui::ButtonType::Push);
     let main_menu_button =
         crate::ui::Button::new("Main Menu", 5.0, screen_height() - 35.0, 150.0, 30.0, crate::ui::ButtonType::Push);
-
-    let mut window = crate::ui::PopupWindow::new(
-        "This is the settings menu.\nHere you can adjust your preferences like\naudio volume, difficulty, Discord Rich Presence, etc.",
-        screen_width() / 2.0 - 300.0,
-        screen_height() / 2.0 - 150.0,
-        600.0,
-        300.0,
-        Vec::new(),
-    );
 
     loop {
         draw_text_ex(
@@ -60,12 +51,10 @@ pub async fn render_settings_screen(game: &mut crate::structs::Game) {
             if main_menu_button.is_clicked(&game.audio.sfx_sinks[0]) {
                 game.save_game();
                 game.data = crate::structs::Data::init();
-                game.previous_screen = Some(crate::structs::Screens::InGame);
                 game.current_screen = crate::structs::Screens::MainMenu;
                 break;
             }
         }
-        window.draw(Some(&game.fonts[0]));
         game.cursor.update();
         macroquad::window::next_frame().await;
     }

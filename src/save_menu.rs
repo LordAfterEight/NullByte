@@ -1,6 +1,6 @@
 use macroquad::prelude::*;
 
-pub async fn render_save_menu(game: &mut crate::structs::Game) {
+pub async fn render_save_menu(game: &mut crate::structs::Game<'_>) {
     let exit_button =
         crate::ui::Button::new("Back", 5.0, 2.5, 100.0, 30.0, crate::ui::ButtonType::Push);
 
