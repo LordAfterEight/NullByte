@@ -78,7 +78,7 @@ pub async fn render_game_screen(game: &mut crate::structs::Game<'_>) {
         screen_height() / 2.0 - 150.0,
         600.0,
         300.0,
-        Vec::new(),
+        None
     );
 
     loop {
@@ -88,8 +88,8 @@ pub async fn render_game_screen(game: &mut crate::structs::Game<'_>) {
             break;
         }
 
-        game.cursor.update();
         window.draw(Some(&game.fonts[0]));
+        game.cursor.update();
         macroquad::window::next_frame().await;
     }
 }

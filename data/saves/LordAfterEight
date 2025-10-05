@@ -17,7 +17,7 @@
   {
     "difficulty": 122,
     "discord_rich_presence": true,
-    "mus_vol": 0.5,
+    "mus_vol": 0.75,
     "sfx_vol": 0.5
   }
 ]

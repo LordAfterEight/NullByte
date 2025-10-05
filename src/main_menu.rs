@@ -12,6 +12,15 @@ pub fn render_main_menu(game: &mut crate::structs::Game) {
     let subtitle = format!("V{}", env!("CARGO_PKG_VERSION"));
     let time = &format!("{}", chrono::Local::now().format("%H:%M:%S"));
 
+    let mut news = crate::ui::PopupWindow::new(
+        &format!("What's new? (v{})\n\n- Discord Rich Presence\n- Audio Settings", std::env!("CARGO_PKG_VERSION")),
+        20.0,
+        screen_height() / 2.0 - 100.0,
+        400.0,
+        200.0,
+        None,
+    );
+
     draw_text_ex(
         time,
         (screen_w - measure_text(time, Some(&game.fonts[0]), 25, 1.0).width) / 2.0,
@@ -26,7 +35,8 @@ pub fn render_main_menu(game: &mut crate::structs::Game) {
 
     draw_text_ex(
         title,
-        (screen_w - measure_text(title, Some(&game.fonts[1]), title_font_size as u16, 1.0).width) / 2.0,
+        (screen_w - measure_text(title, Some(&game.fonts[1]), title_font_size as u16, 1.0).width)
+            / 2.0,
         screen_h / 4.0 - 10.0,
         TextParams {
             font_size: title_font_size as u16,
@@ -39,7 +49,7 @@ pub fn render_main_menu(game: &mut crate::structs::Game) {
     draw_text_ex(
         &subtitle,
         (screen_w - measure_text(&subtitle, Some(&game.fonts[0]), 30, 1.0).width) / 2.0,
-        screen_h / 4.0 + 40.0,
+        screen_h / 4.0 + 50.0,
         TextParams {
             font_size: 30,
             color: GRAY,
@@ -49,10 +59,13 @@ pub fn render_main_menu(game: &mut crate::structs::Game) {
     );
 
     draw_line(
-        (screen_w - measure_text(title, Some(&game.fonts[1]), title_font_size as u16, 1.0).width) / 2.0,
+        (screen_w - measure_text(title, Some(&game.fonts[1]), title_font_size as u16, 1.0).width)
+            / 2.0,
         screen_h / 4.0 + 7.0,
         measure_text(title, Some(&game.fonts[1]), title_font_size as u16, 1.0).width
-            + (screen_w - measure_text(title, Some(&game.fonts[1]), title_font_size as u16, 1.0).width) / 2.0,
+            + (screen_w
+                - measure_text(title, Some(&game.fonts[1]), title_font_size as u16, 1.0).width)
+                / 2.0,
         screen_h / 4.0 + 7.0,
         2.0,
         RED,
@@ -130,6 +143,7 @@ pub fn render_main_menu(game: &mut crate::structs::Game) {
     play_button.draw(Some(&game.fonts[1]));
     settings_button.draw(Some(&game.fonts[1]));
     exit_button.draw(Some(&game.fonts[1]));
+    news.draw(Some(&game.fonts[0]));
 
     if exit_button.is_clicked(&game.audio.sfx_sinks[0]) {
         std::thread::sleep(std::time::Duration::from_millis(400));

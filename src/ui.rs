@@ -153,15 +153,7 @@ impl TextInputLabel {
         }
     }
 
-    pub fn is_hovered(&self) -> bool {
-        let (mouse_x, mouse_y) = mouse_position();
-        mouse_x >= self.x
-            && mouse_x <= self.x + self.width
-            && mouse_y >= self.y
-            && mouse_y <= self.y + self.height
-    }
-
-    pub fn update(&mut self, sink_sfx: &rotilities::Sink) -> bool {
+    pub fn is_clicked(&mut self, sink_sfx: &rotilities::Sink) -> bool {
         match self.is_hovered() {
             true => {
                 let ret_value = is_mouse_button_released(MouseButton::Left);
@@ -176,6 +168,20 @@ impl TextInputLabel {
             }
             false => false,
         }
+    }
+
+    pub fn is_hovered(&self) -> bool {
+        let (mouse_x, mouse_y) = mouse_position();
+        mouse_x >= self.x
+            && mouse_x <= self.x + self.width
+            && mouse_y >= self.y
+            && mouse_y <= self.y + self.height
+    }
+
+    pub fn update(&mut self, sink_sfx: &rotilities::Sink, font: &Font) -> &Option<String> {
+        self.is_clicked(sink_sfx);
+        self.draw(Some(font));
+        return &self.label
     }
 
     pub fn draw(&mut self, font: Option<&Font>) {
@@ -267,43 +273,43 @@ impl TextInputLabel {
         );
     }
 
-    /// Handles any global keyboard input. Returns a bool (set if [ENTER] is pressed) and either Some(String) containing a copy of the label text or None
+    /// Handles any global keyboard input. Returns true if [Enter] is pressed and always returns an Option<String> containing the label text
     pub fn use_input(&mut self, game: &mut crate::structs::Game) -> (bool, Option<String>) {
         if self.is_active {
             if is_key_down(KeyCode::Backspace) {
                 if self.backspace_repeat <= 0 {
                     self.text.pop();
                     self.backspace_repeat = 4;
-                    (false, None)
+                    (false, Some(self.text.clone()))
                 } else {
                     self.backspace_repeat -= 1;
-                    (false, None)
+                    (false, Some(self.text.clone()))
                 }
             } else if is_key_pressed(KeyCode::Escape) {
                 self.is_active = false;
-                (false, None)
+                (false, Some(self.text.clone()))
             } else {
                 if is_key_pressed(KeyCode::Enter) {
                     return (true, Some(self.text.clone()));
                 }
                 match macroquad::input::get_char_pressed() {
                     Some(c) => {
-                        if self.text.len() < 30 && (c.is_alphabetic() || c.is_numeric()) {
+                        if self.text.len() < 30 && (c.is_alphabetic() || c.is_numeric() || c.is_ascii_punctuation()) {
                             self.text.push(c);
-                        } else {
+                        } else if !c.is_ascii_control() {
                             rotilities::play_audio(
                                 &game.audio.sfx_sinks[0],
                                 "./assets/sound/sfx/fail.mp3",
                             );
                         }
                         macroquad::input::clear_input_queue();
-                        return (false, None);
+                        return (false, Some(self.text.clone()));
                     }
-                    None => (false, None),
+                    None => (false, Some(self.text.clone())),
                 }
             }
         } else {
-            return (false, None);
+            return (false, Some(self.text.clone()));
         }
     }
 }
@@ -314,11 +320,11 @@ pub struct PopupWindow {
     width: f32,
     height: f32,
     text: String,
-    buttons: Vec<Button>,
+    buttons: Option<Vec<Button>>,
 }
 
 impl PopupWindow {
-    pub fn new(text: &str, x: f32, y: f32, width: f32, height: f32, buttons: Vec<Button>) -> Self {
+    pub fn new(text: &str, x: f32, y: f32, width: f32, height: f32, buttons: Option<Vec<Button>>) -> Self {
         Self {
             text: text.to_string(),
             x,

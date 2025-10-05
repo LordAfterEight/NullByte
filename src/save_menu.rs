@@ -185,10 +185,8 @@ pub async fn render_save_menu(game: &mut crate::structs::Game<'_>) {
             break;
         }
 
-        name_label.update(&game.audio.sfx_sinks[0]);
-        name_label.draw(Some(&game.fonts[0]));
-        age_label.update(&game.audio.sfx_sinks[0]);
-        age_label.draw(Some(&game.fonts[0]));
+        name_label.update(&game.audio.sfx_sinks[0], &game.fonts[0]);
+        age_label.update(&game.audio.sfx_sinks[0], &game.fonts[0]);
         exit_button.draw(Some(&game.fonts[1]));
         for i in 0..saves.len() {
             saves[i].draw(Some(&game.fonts[1]));
