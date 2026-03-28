@@ -10,7 +10,7 @@ const RING_BUFFER_FRAMES: usize = 8192;
 const VOLUME_MULTIPLIER: f32 = 0.5;
 
 #[cfg(target_os = "linux")]
-const VOLUME_MULTIPLIER: f32 = 2.0;
+const VOLUME_MULTIPLIER: f32 = 1.0;
 
 pub struct AudioManager {
     pub channels: Vec<Channel>,
@@ -115,6 +115,14 @@ impl AudioManager {
         }
     }
 
+    pub fn has_next(&self, label: &str) -> bool {
+        if let Some(channel) = self.channels.iter().find(|c| c.label == label) {
+            return channel.next.is_some()
+        } else {
+            return false;
+        }
+    }
+
     pub fn update(&mut self) {
         let writable_frames = self.producer.vacant_len() / 2;
         if writable_frames == 0 {
@@ -151,12 +159,10 @@ impl AudioManager {
                     frames_written += read_data.num_frames();
                 }
 
-                // Check if we hit EOF on this stream
                 let info = channel.read_disk_stream.info();
                 if channel.read_disk_stream.playhead() >= info.num_frames {
                     if let Some(next_stream) = channel.next.take() {
                         channel.read_disk_stream = next_stream;
-                        // Loop continues — read remaining frames from next stream
                     } else {
                         channel.finished = true;
                         break;

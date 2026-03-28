@@ -1,7 +1,7 @@
 pub struct Player {
     pub save_dir: String,
     pub username: String,
-    pub devices: Vec<Box<dyn crate::core::device::DeviceTrait>>,
+    pub devices: Vec<Box<dyn crate::core::device::Device>>,
 }
 
 impl Player {
@@ -19,5 +19,11 @@ impl Player {
             username: name.to_string(),
             devices: Vec::new()
         }
+    }
+
+    pub fn add_device<T: crate::core::device::Device>(&mut self, device: T) -> &mut Self{
+        let device = Box::new(device);
+        self.devices.push(device);
+        self
     }
 }

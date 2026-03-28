@@ -9,3 +9,4 @@ creek = "1.2.3"
 minifb-ui = "0.1.15"
 rand = "0.10.0"
 ringbuf = "0.4.8"
+serde = { version = "1.0.228", features = ["serde_derive"] }
