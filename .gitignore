@@ -1,5 +1,6 @@
 target
 data/saves/**
+.xwin-cache
 
 
 # Added by cargo

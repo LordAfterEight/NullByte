@@ -4,5 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+cpal = "0.17.3"
+creek = "1.2.3"
 minifb-ui = "0.1.15"
-rotilities = "0.2.8"
+rand = "0.10.0"
+ringbuf = "0.4.8"
