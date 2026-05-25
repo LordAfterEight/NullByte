@@ -3,32 +3,49 @@ use NullByte;
 use NullByte::core::{Game, player};
 use NullByte::devices;
 
-use minifb_ui::ui::text::Text;
+const TITLE_COLOR: winit_ui::color::Color = winit_ui::color::Color::new(0xFF, 0x00, 0x00, 0xFF);
 
 fn main() {
-    let mut game = Game::init();
-    game.window.window.set_target_fps(30);
+    let settings = NullByte::core::settings::Settings::load_or_default("settings.toml");
 
-    let black = minifb_ui::color::Color::from(0x0);
+    let mut app = winit_ui::App::new(
+        "NullByte",
+        settings.window.width,
+        settings.window.height,
+        settings.window.resizable,
+        settings.window.fullscreen,
+    );
+
+    let mut game = Game::init(settings);
 
     game.player = Some(player::Player::new("Default Player Name"));
     game.player
         .as_mut()
         .unwrap()
-        .add_device(crate::devices::miner::Miner::new(0));
-
+        .add_device(devices::miner::Miner::new(0));
 
     game.audio_manager.new_channel(
         "assets/sound/NullByte Computer Ambience Start.wav",
         "Ambience",
     );
-
     game.audio_manager.set_next("Ambience", "assets/sound/NullByte Computer Ambience.wav");
 
-    let mut amb_vol = Text::new(
-        &format!("Ambience volume: {}%", game.settings.ambience_volume * 100.0),
-        minifb_ui::ttf::Font::new("assets/fonts/good timing bd.otf"),
-        );
+    let font_regular = winit_ui::font::Font::new("assets/fonts/IBMPlexMono-Regular.ttf");
 
-    game.title_screen();
+    app.on_draw(move |canvas| {
+        if !game.audio_manager.has_next("Ambience") {
+            game.audio_manager.set_next("Ambience", "assets/sound/NullByte Computer Ambience.wav");
+        }
+
+
+        canvas.draw_text(
+            canvas.width / 2 - winit_ui::get_text_width("NullByte", 96.0, &font_regular) / 2,
+            canvas.height / 4,
+            96.0, "NullByte",
+            &font_regular,
+            &TITLE_COLOR
+        );
+        game.update();
+    });
+    app.run();
 }
