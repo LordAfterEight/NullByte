@@ -11,4 +11,4 @@ rand = "0.10.0"
 ringbuf = "0.5.0"
 serde = { version = "1.0.228", features = ["serde_derive"] }
 toml = "1.1.2"
-winit-ui = "0.1.0"
+winit-ui = "0.2.0"

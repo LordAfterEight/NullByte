@@ -3165,9 +3165,9 @@ dependencies = [
 
 [[package]]
 name = "winit-ui"
-version = "0.1.8"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e90f0c61445c9e08ce97e692e5c2b056afceb1d5aa3cebe04dfe6a5e976bc184"
+checksum = "b82ceddfab4cace67ac0ff985adf9826dfd7fed5eabe22f2493850291d29db6b"
 dependencies = [
  "fontdue",
  "pixels",

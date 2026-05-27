@@ -7,5 +7,5 @@ ambience_volume = 1.0
 [window]
 width = 1920
 height = 1080
-fullscreen = true
-resizable = false
+fullscreen = false
+resizable = true
