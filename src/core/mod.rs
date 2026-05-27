@@ -22,12 +22,14 @@ impl Game {
 
     pub fn update(&mut self) {
         let master = self.settings.sound.master_volume;
+        let fade_duration = 10.0;
+        let fade = (self.instant_start.elapsed().as_secs_f32() / fade_duration).min(1.0);
         self.audio_manager
-            .set_volume("Ambience", self.settings.sound.ambience_volume * master);
+            .set_volume("Ambience", self.settings.sound.ambience_volume * master * fade);
         self.audio_manager
-            .set_volume("SFX", self.settings.sound.sfx_volume * master);
+            .set_volume("SFX", self.settings.sound.sfx_volume * master * fade);
         self.audio_manager
-            .set_volume("Music", self.settings.sound.music_volume * master);
+            .set_volume("Music", self.settings.sound.music_volume * master * fade);
         self.audio_manager.update();
     }
 }

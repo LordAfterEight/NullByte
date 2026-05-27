@@ -72,7 +72,7 @@ impl AudioManager {
             label: name.to_string(),
             read_disk_stream: stream,
             next: None,
-            volume: 1.0,
+            volume: 0.0,
             finished: false,
         });
     }
